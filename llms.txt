@@ -1,0 +1,115 @@
+# 📚 Documentação de Integração com a API da IQ Option via biblioteca iq-core
+
+Este documento fornece instruções, exemplos e boas práticas para usar a biblioteca `iq-core` para interagir com a plataforma IQ Option, com foco em automação de trades.
+
+---
+
+## 🧭 Índice
+
+- ✅ Instalação da biblioteca
+- 🔐 Autenticação (AuthService)
+- 💹 Obtenção de instrumentos (InstrumentService)
+- 🎯 Operações de trade
+  - Binary
+  - Blitz
+  - Digital
+  - Forex
+- 🤖 Trading automatizado (TradingManagerService)
+- 📈 Acesso a candles (CandleService)
+- 🧾 Gestão de conta e saldo (AccountService)
+- 🪪 TokenManager (autenticação persistente)
+- ⚠️ Tratamento de erros
+- 🌐 WebSocket personalizado
+- 🛡️ Boas práticas
+
+---
+
+## ✅ Instalação
+
+```bash
+pip install iq-core
+
+## 🔐 Autenticação
+
+from iqoptionapi.services.auth import AuthService
+
+auth = AuthService()
+auth.login(email='your_email', password='your_password')
+
+
+## 💹 Obter instrumentos disponíveis
+
+from iqoptionapi.services.instrument import InstrumentService
+
+instrument_service = InstrumentService()
+instruments = instrument_service.get_all()
+print(instruments)
+
+
+## 🎯 Operações de trade – exemplo Binary
+
+from iqoptionapi.services.binary import BinaryService
+
+binary = BinaryService()
+binary.buy(asset="EURUSD", direction="call", duration=1, amount=1.00)
+
+
+## 🤖 Automação com TradingManagerService
+
+from iqoptionapi.services.manager import TradingManagerService
+
+manager = TradingManagerService()
+manager.start()
+
+
+## 📈 Obter dados de candles
+
+from iqoptionapi.services.candle import CandleService
+
+candle = CandleService()
+candles = candle.get("EURUSD", interval=60, count=10)
+
+
+## 🧾 Ver saldo e tipo de conta
+
+from iqoptionapi.services.account import AccountService
+
+account = AccountService()
+balance = account.get_balance()
+account_type = account.get_account_type()
+
+
+## 🪪 TokenManager
+
+from iqoptionapi.services.token import TokenManager
+
+tokens = TokenManager()
+tokens.save("session_token_here")
+
+
+## ⚠️ Tratamento de Erros
+
+try:
+    binary.buy("EURUSD", "call", 1, 1.00)
+except Exception as e:
+    print("Erro ao realizar operação:", e)
+
+
+## 🌐 WebSocket Personalizado
+
+from iqoptionapi.websocket import WebSocketClient
+
+ws = WebSocketClient()
+ws.connect()
+ws.subscribe("candles", asset="EURUSD", interval=60)
+
+
+## 🛡️ Boas Práticas
+
+Nunca compartilhe seu token de autenticação.
+
+Use valores pequenos em contas de teste.
+
+Sempre trate erros com try/except.
+
+Utilize logs para acompanhar operações automatizadas.
