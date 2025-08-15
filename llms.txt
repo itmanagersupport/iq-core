@@ -1,115 +1,132 @@
-# 📚 Documentação de Integração com a API da IQ Option via biblioteca iq-core
+# Documentação da API da IQ Option via biblioteca iq-core
 
-Este documento fornece instruções, exemplos e boas práticas para usar a biblioteca `iq-core` para interagir com a plataforma IQ Option, com foco em automação de trades.
+Este arquivo fornece exemplos de uso prático da biblioteca `iq-core` para integrar sistemas com a API pública da IQ Option. A biblioteca é orientada a serviços, escrita em Python, e suporta operações síncronas e assíncronas.
 
 ---
 
-## 🧭 Índice
+## Índice
 
-- ✅ Instalação da biblioteca
-- 🔐 Autenticação (AuthService)
-- 💹 Obtenção de instrumentos (InstrumentService)
-- 🎯 Operações de trade
+- Instalação
+- Autenticação (AuthService)
+- Acesso a instrumentos (InstrumentService)
+- Operações de trade
   - Binary
   - Blitz
   - Digital
   - Forex
-- 🤖 Trading automatizado (TradingManagerService)
-- 📈 Acesso a candles (CandleService)
-- 🧾 Gestão de conta e saldo (AccountService)
-- 🪪 TokenManager (autenticação persistente)
-- ⚠️ Tratamento de erros
-- 🌐 WebSocket personalizado
-- 🛡️ Boas práticas
+- Obtenção de candles (CandleService)
+- Trading automatizado (TradingManagerService)
+- Gestão de conta e saldo (AccountService)
+- Autenticação persistente (TokenManager)
+- WebSocket (tempo real)
+- Tratamento de erros
+- Boas práticas
 
 ---
 
-## ✅ Instalação
+## Instalação
 
 ```bash
 pip install iq-core
 
-## 🔐 Autenticação
 
-from iqoptionapi.services.auth import AuthService
+Autenticação (AuthService)
+from iq_core.services.auth_service import AuthService
 
 auth = AuthService()
-auth.login(email='your_email', password='your_password')
+await auth.authenticate_with_token("YOUR_IQ_OPTION_API_TOKEN")
 
 
-## 💹 Obter instrumentos disponíveis
-
-from iqoptionapi.services.instrument import InstrumentService
+Acesso a instrumentos (InstrumentService)
+from iq_core.services.instrument_service import InstrumentService
 
 instrument_service = InstrumentService()
-instruments = instrument_service.get_all()
+instruments = await instrument_service.get_all()
 print(instruments)
 
 
-## 🎯 Operações de trade – exemplo Binary
+Operações de Trade
+Binary
+from iq_core.services.binary_trade_service import BinaryTradeService
 
-from iqoptionapi.services.binary import BinaryService
+service = BinaryTradeService()
+result = await service.buy("EURUSD", "call", 1, 1.00)
+print(result)
 
-binary = BinaryService()
-binary.buy(asset="EURUSD", direction="call", duration=1, amount=1.00)
+
+Blitz
+from iq_core.services.blitz_trade_service import BlitzTradeService
+
+service = BlitzTradeService()
+await service.buy("EURUSD", "put", 5, 2.50)
 
 
-## 🤖 Automação com TradingManagerService
+Digital
+from iq_core.services.digital_trade_service import DigitalTradeService
 
-from iqoptionapi.services.manager import TradingManagerService
+service = DigitalTradeService()
+await service.buy("EURUSD", "call", 1, 5.00)
+
+
+Forex
+from iq_core.services.forex_trade_service import ForexTradeService
+
+service = ForexTradeService()
+await service.buy("EURUSD", size=10)
+
+
+Obtenção de candles (CandleService)
+from iq_core.services.candle_service import CandleService
+
+candle_service = CandleService()
+candles = await candle_service.get("EURUSD", interval=60, count=10)
+
+
+Trading automatizado (TradingManagerService)
+from iq_core.services.manager_service import TradingManagerService
 
 manager = TradingManagerService()
 manager.start()
 
 
-## 📈 Obter dados de candles
-
-from iqoptionapi.services.candle import CandleService
-
-candle = CandleService()
-candles = candle.get("EURUSD", interval=60, count=10)
-
-
-## 🧾 Ver saldo e tipo de conta
-
-from iqoptionapi.services.account import AccountService
+Gestão de conta e saldo (AccountService)
+from iq_core.services.account_service import AccountService
 
 account = AccountService()
-balance = account.get_balance()
-account_type = account.get_account_type()
+balance = await account.get_balance()
+print(balance)
 
 
-## 🪪 TokenManager
+Autenticação persistente (TokenManager)
+from iq_core.services.token_manager import TokenManager
 
-from iqoptionapi.services.token import TokenManager
-
-tokens = TokenManager()
-tokens.save("session_token_here")
-
-
-## ⚠️ Tratamento de Erros
-
-try:
-    binary.buy("EURUSD", "call", 1, 1.00)
-except Exception as e:
-    print("Erro ao realizar operação:", e)
+token_manager = TokenManager()
+token_manager.save("YOUR_SESSION_TOKEN")
 
 
-## 🌐 WebSocket Personalizado
-
-from iqoptionapi.websocket import WebSocketClient
+WebSocket (tempo real)
+from iq_core.websocket.websocket_client import WebSocketClient
 
 ws = WebSocketClient()
 ws.connect()
 ws.subscribe("candles", asset="EURUSD", interval=60)
 
 
-## 🛡️ Boas Práticas
+Tratamento de erros
+try:
+    await binary.buy("EURUSD", "call", 1, 1.00)
+except Exception as e:
+    print("Erro ao realizar operação:", e)
 
-Nunca compartilhe seu token de autenticação.
 
-Use valores pequenos em contas de teste.
+Boas práticas
 
-Sempre trate erros com try/except.
+Armazene seus tokens em variáveis de ambiente, nunca em código-fonte.
 
-Utilize logs para acompanhar operações automatizadas.
+Use contas de demonstração ao testar estratégias automatizadas.
+
+Sempre trate exceções e erros de rede.
+
+Utilize async/await corretamente para evitar bloqueios na execução.
+
+Registre logs de todas as ordens executadas.
